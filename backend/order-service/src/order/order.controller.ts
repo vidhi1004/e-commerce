@@ -1,0 +1,60 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  ParseIntPipe,
+  SetMetadata,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import { OrderService } from './order.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
+import { Role } from 'src/enum/role.enum';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RoleGuard } from 'src/auth/role.guard';
+
+@Controller('order')
+export class OrderController {
+  constructor(private readonly orderService: OrderService) {}
+
+  @UseGuards(AuthGuard)
+  @Post()
+  create(@Body() createOrderDto: CreateOrderDto, @Req() req) {
+    const userId = Number(req.user.id);
+    return this.orderService.create(userId, createOrderDto);
+  }
+  @SetMetadata('role', Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Get()
+  findAll() {
+    return this.orderService.findAll();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req) {
+    const userId = Number(req.user.id);
+    return this.orderService.findOne(id, userId);
+  }
+
+  @SetMetadata('role', Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    return this.orderService.update(id, updateOrderDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id/cancel')
+  cancelOrder(@Param('id', ParseIntPipe) id: number, @Req() req) {
+    const userId = Number(req.user.id);
+    return this.orderService.cancelOrder(id, userId);
+  }
+}

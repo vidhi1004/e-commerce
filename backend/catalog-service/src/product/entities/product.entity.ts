@@ -1,0 +1,44 @@
+import { Category } from 'src/category/entities/category.entity';
+import { ProductImage } from 'src/product-image/entities/product-image.entity';
+import { ProductVariant } from 'src/product-variant/entities/product-variant.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+
+@Entity()
+export class Product {
+  @PrimaryGeneratedColumn({
+    type: 'bigint',
+    name: 'id',
+  })
+  id: number;
+  @Column()
+  name: string;
+  @Column()
+  description: string;
+  @Column()
+  brand: string;
+  @Column({
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  @Column({ default: true })
+  isActive: boolean;
+  createdAt: Date;
+  @Column({
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+
+  @ManyToOne(() => Category, (category) => category.product)
+  category: Category;
+
+  @OneToMany(() => ProductVariant, (variants) => variants.product)
+  variants: ProductVariant[];
+
+  @OneToMany(() => ProductImage, (image) => image.product)
+  image: ProductImage[];
+}

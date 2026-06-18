@@ -14,7 +14,7 @@ import { ProductVariant } from 'src/product-variant/entities/product-variant.ent
 export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
-    private readonly inverntoryRepo: Repository<Inventory>,
+    private readonly inventoryRepo: Repository<Inventory>,
     @InjectRepository(ProductVariant)
     private readonly productVariantRepo: Repository<ProductVariant>,
   ) {}
@@ -25,7 +25,7 @@ export class InventoryService {
     if (!productVariant) {
       throw new NotFoundException('Product Variant Not Found');
     }
-    const IsInInventory = await this.inverntoryRepo.findOne({
+    const IsInInventory = await this.inventoryRepo.findOne({
       where: {
         productVariant: {
           id: createInventoryDto.productVariantId,
@@ -35,19 +35,19 @@ export class InventoryService {
     if (IsInInventory) {
       throw new ConflictException('Invertory already exists');
     }
-    const inventory = this.inverntoryRepo.create({
+    const inventory = this.inventoryRepo.create({
       ...createInventoryDto,
       productVariant,
     });
-    return this.inverntoryRepo.save(inventory);
+    return this.inventoryRepo.save(inventory);
   }
 
   async findAll() {
-    return await this.inverntoryRepo.find();
+    return await this.inventoryRepo.find();
   }
 
   async findOne(id: number) {
-    const inventory = await this.inverntoryRepo.findOne({
+    const inventory = await this.inventoryRepo.findOne({
       where: { id },
     });
     if (!inventory) {
@@ -57,7 +57,7 @@ export class InventoryService {
   }
 
   async update(id: number, updateInventoryDto: UpdateInventoryDto) {
-    const inventory = await this.inverntoryRepo.findOne({ where: { id } });
+    const inventory = await this.inventoryRepo.findOne({ where: { id } });
     if (!inventory) {
       throw new NotFoundException(`inventory with id ${id} not found`);
     }
@@ -72,15 +72,45 @@ export class InventoryService {
         throw new NotFoundException('Product Variant Not Found');
       }
     }
-    const updateInventory = Object.assign(inventory, updateInventoryDto);
-    return await this.inverntoryRepo.save(updateInventory);
+    if (updateInventoryDto.stock !== undefined) {
+      inventory.stock = updateInventoryDto.stock;
+    }
+    if (updateInventoryDto.reservedStock !== undefined) {
+      inventory.reservedStock = updateInventoryDto.reservedStock;
+    }
+    return await this.inventoryRepo.save(inventory);
+  }
+
+  async reserveStock(productVariantId: number, quantity: number) {
+    const inventory = await this.inventoryRepo.findOne({
+      where: { productVariant: { id: productVariantId } },
+    });
+
+    if (!inventory) {
+      console.error(`Inventory for Variant ID ${productVariantId} not found.`);
+      return;
+    }
+
+    inventory.stock -= quantity;
+    inventory.reservedStock += quantity;
+    await this.inventoryRepo.save(inventory);
+  }
+  async orderConfirmed(productVariantId: number, quantity: number) {
+    const inventory = await this.inventoryRepo.findOne({
+      where: { productVariant: { id: productVariantId } },
+    });
+    if (!inventory) {
+      throw new ConflictException('Inventory Not Found');
+    }
+    inventory.reservedStock = Math.max(0, inventory.reservedStock - quantity);
+    await this.inventoryRepo.save(inventory);
   }
 
   async remove(id: number) {
-    const inventory = await this.inverntoryRepo.findOne({ where: { id } });
+    const inventory = await this.inventoryRepo.findOne({ where: { id } });
     if (!inventory) {
       throw new NotFoundException(`inventory with id ${id} not found`);
     }
-    return await this.inverntoryRepo.delete(inventory);
+    return await this.inventoryRepo.delete(inventory);
   }
 }

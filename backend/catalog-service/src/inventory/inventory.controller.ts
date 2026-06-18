@@ -16,6 +16,7 @@ import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/auth/enum/role.enum';
+import { EventPattern } from '@nestjs/microservices';
 
 @Controller('inventory')
 export class InventoryController {
@@ -50,5 +51,36 @@ export class InventoryController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.inventoryService.remove(id);
+  }
+  @EventPattern('order.created')
+  async handleOrderCreated(data: { items: any[] }) {
+    try {
+      if (data && data.items) {
+        for (const item of data.items) {
+          await this.inventoryService.reserveStock(
+            item.productVariantId,
+            item.quantity,
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error processing order.created event:', error);
+    }
+  }
+
+  @EventPattern('order.confirmed')
+  async handleOrderConfirmed(data: { order: any }) {
+    try {
+      if (data && data.order && data.order.items) {
+        for (const item of data.order.items) {
+          await this.inventoryService.orderConfirmed(
+            item.productVariantId,
+            item.quantity,
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error processing order.confirmed event:', error);
+    }
   }
 }

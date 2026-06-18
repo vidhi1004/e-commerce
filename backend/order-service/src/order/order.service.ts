@@ -14,7 +14,7 @@ import { OrderItem } from './entities/orderItem.entity';
 import { HttpService } from '@nestjs/axios';
 import { Status } from '../enum/status.enum';
 import { firstValueFrom } from 'rxjs';
-import { NOTIFICATION_CLIENT } from 'src/constants';
+import { INVENTORY_CLIENT, NOTIFICATION_CLIENT } from 'src/constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
@@ -27,6 +27,8 @@ export class OrderService {
     private readonly httpService: HttpService,
     @Inject(NOTIFICATION_CLIENT)
     private readonly notificationClinet: ClientProxy,
+    @Inject(INVENTORY_CLIENT)
+    private readonly inventoryClinet: ClientProxy,
   ) {}
   private async getProduct(id: number) {
     const product = await firstValueFrom(
@@ -106,6 +108,9 @@ export class OrderService {
       status: savedOrder.status,
       totalAmount,
     });
+    this.inventoryClinet.emit('order.created', {
+      items: createOrderDto.items,
+    });
     return await this.orderRepo.findOne({
       where: { id: savedOrder.id },
       relations: {
@@ -144,6 +149,9 @@ export class OrderService {
       throw new NotFoundException(`Order with orderId ${id} Not Found`);
     }
     const updatedOrder = Object.assign(order, updateOrderDto);
+    if (order.status === Status.CONFIRMED) {
+      this.inventoryClinet.emit('order.confirmed', { order });
+    }
 
     return await this.orderRepo.save(updatedOrder);
   }

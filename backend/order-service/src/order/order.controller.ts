@@ -16,6 +16,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Role } from 'src/enum/role.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RoleGuard } from 'src/auth/role.guard';
+import { EventPattern, MessagePattern } from '@nestjs/microservices';
+import { Status } from 'src/enum/status.enum';
 
 @Controller('order')
 export class OrderController {
@@ -56,5 +58,11 @@ export class OrderController {
   cancelOrder(@Param('id', ParseIntPipe) id: number, @Req() req) {
     const userId = Number(req.user.id);
     return this.orderService.cancelOrder(id, userId);
+  }
+  @EventPattern('payment.success')
+  handlePaymentResponse(data: any) {
+    const id = data.orderId;
+    const updateOrderDto = { status: Status.CONFIRMED };
+    return this.orderService.update(id, updateOrderDto);
   }
 }

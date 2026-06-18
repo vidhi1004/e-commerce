@@ -6,7 +6,7 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/orderItem.entity';
 import { HttpModule } from '@nestjs/axios';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NOTIFICATION_CLIENT } from 'src/constants';
+import { INVENTORY_CLIENT, NOTIFICATION_CLIENT } from 'src/constants';
 
 @Module({
   imports: [
@@ -19,6 +19,19 @@ import { NOTIFICATION_CLIENT } from 'src/constants';
         options: {
           urls: ['amqp://guest:guest@localhost:5672'],
           queue: 'notification_queue',
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: INVENTORY_CLIENT,
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://guest:guest@localhost:5672'],
+          queue: 'inventory_queue',
           queueOptions: {
             durable: true,
           },

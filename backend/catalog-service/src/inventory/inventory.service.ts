@@ -105,12 +105,24 @@ export class InventoryService {
     inventory.reservedStock = Math.max(0, inventory.reservedStock - quantity);
     await this.inventoryRepo.save(inventory);
   }
+  async orderCancelled(productVariantId: number, quantity: number) {
+    const inventory = await this.inventoryRepo.findOne({
+      where: { productVariant: { id: productVariantId } },
+    });
+    if (!inventory) {
+      throw new ConflictException('Inventory Not Found');
+    }
+    inventory.stock += quantity;
+
+    inventory.reservedStock = Math.max(0, inventory.reservedStock - quantity);
+    await this.inventoryRepo.save(inventory);
+  }
 
   async remove(id: number) {
     const inventory = await this.inventoryRepo.findOne({ where: { id } });
     if (!inventory) {
       throw new NotFoundException(`inventory with id ${id} not found`);
     }
-    return await this.inventoryRepo.delete(inventory);
+    return await this.inventoryRepo.remove(inventory);
   }
 }

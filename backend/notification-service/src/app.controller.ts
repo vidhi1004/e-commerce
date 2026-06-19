@@ -8,7 +8,11 @@ export class AppController {
 
   @EventPattern('order.created')
   async sendOrderEmail(data: any) {
-    console.log(data);
+    const recipients = data.email;
+    const subject = 'Order created , move to payment to confirm the order';
+    const html = `<h1>Order Created!</h1><p>Please pay.</p>`;
+    const sendEmailDto = { recipients, subject, html };
+    return this.appService.sendEmail(sendEmailDto);
   }
   @EventPattern('payment.success')
   async handleOrderSuccess(data: any) {

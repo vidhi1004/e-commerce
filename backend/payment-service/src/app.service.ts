@@ -31,7 +31,7 @@ export class AppService {
     const order = await firstValueFrom(
       this.httpService.get(`http://localhost:3001/order/${id}`, {
         headers: {
-          Authorization: token,
+          Authorization: `Bearer ${token}`,
         },
       }),
     );

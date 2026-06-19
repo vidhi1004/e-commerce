@@ -32,23 +32,23 @@ export class OrderService {
   ) {}
   private async getProduct(id: number) {
     const product = await firstValueFrom(
-      this.httpService.get(`http://catalog-service:3001/product/${id}`),
+      this.httpService.get(`http://localhost:3001/product/${id}`),
     );
     return product.data;
   }
   private async getProductVariant(id: number) {
     const productVariant = await firstValueFrom(
-      this.httpService.get(`http://catalog-service:3001/product-variant/${id}`),
+      this.httpService.get(`http://localhost:3001/product-variant/${id}`),
     );
     return productVariant.data;
   }
   private async getInventory(id: number) {
     const inventory = await firstValueFrom(
-      this.httpService.get(`http://catalog-service:3001/inventory/${id}`),
+      this.httpService.get(`http://localhost:3001/inventory/${id}`),
     );
     return inventory.data;
   }
-  async create(userId: number, createOrderDto: CreateOrderDto) {
+  async create(userId: number, createOrderDto: CreateOrderDto, email: string) {
     const items = createOrderDto.items;
     let totalAmount = 0;
     const orderItems: Partial<OrderItem>[] = [];
@@ -102,12 +102,15 @@ export class OrderService {
       await this.orderItemRepo.save(orderItem);
     }
 
-    this.notificationClinet.emit('order.created', {
-      id: savedOrder.id,
-      userId,
-      status: savedOrder.status,
-      totalAmount,
-    });
+    console.log(
+      this.notificationClinet.emit('order.created', {
+        id: savedOrder.id,
+        userId,
+        email,
+        status: savedOrder.status,
+        totalAmount,
+      }),
+    );
     this.inventoryClinet.emit('order.created', {
       items: createOrderDto.items,
     });
@@ -151,6 +154,9 @@ export class OrderService {
     const updatedOrder = Object.assign(order, updateOrderDto);
     if (order.status === Status.CONFIRMED) {
       this.inventoryClinet.emit('order.confirmed', { order });
+    }
+    if (order.status === Status.CANCELLED) {
+      this.inventoryClinet.emit('order.cancelled', { order });
     }
 
     return await this.orderRepo.save(updatedOrder);

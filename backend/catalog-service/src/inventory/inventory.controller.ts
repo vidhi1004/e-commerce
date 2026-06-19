@@ -83,4 +83,19 @@ export class InventoryController {
       console.error('Error processing order.confirmed event:', error);
     }
   }
+  @EventPattern('order.cancelled')
+  async handleOrderCancel(data: { order: any }) {
+    try {
+      if (data && data.order && data.order.items) {
+        for (const item of data.order.items) {
+          await this.inventoryService.orderCancelled(
+            item.productVariantId,
+            item.quantity,
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error processing order.cancelled event:', error);
+    }
+  }
 }

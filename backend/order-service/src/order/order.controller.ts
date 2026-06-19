@@ -27,7 +27,8 @@ export class OrderController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto, @Req() req) {
     const userId = Number(req.user.id);
-    return this.orderService.create(userId, createOrderDto);
+    const email = req.user.email;
+    return this.orderService.create(userId, createOrderDto, email);
   }
   @SetMetadata('role', Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
@@ -60,9 +61,15 @@ export class OrderController {
     return this.orderService.cancelOrder(id, userId);
   }
   @EventPattern('payment.success')
-  handlePaymentResponse(data: any) {
+  handlePaymentConfirmantion(data: any) {
     const id = data.orderId;
     const updateOrderDto = { status: Status.CONFIRMED };
+    return this.orderService.update(id, updateOrderDto);
+  }
+  @EventPattern('payment.failed')
+  handlePaymentFailure(data: any) {
+    const id = data.orderId;
+    const updateOrderDto = { status: Status.CANCELLED };
     return this.orderService.update(id, updateOrderDto);
   }
 }

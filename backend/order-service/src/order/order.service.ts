@@ -147,11 +147,18 @@ export class OrderService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
-    const order = await this.orderRepo.findOne({ where: { id } });
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        items: true,
+      },
+    });
     if (!order) {
       throw new NotFoundException(`Order with orderId ${id} Not Found`);
     }
     const updatedOrder = Object.assign(order, updateOrderDto);
+    console.log('order:', order);
+
     if (order.status === Status.CONFIRMED) {
       this.inventoryClinet.emit('order.confirmed', { order });
     }
@@ -163,7 +170,12 @@ export class OrderService {
   }
 
   async cancelOrder(id: number, userId: number) {
-    const order = await this.orderRepo.findOne({ where: { id } });
+    const order = await this.orderRepo.findOne({
+      where: { id },
+      relations: {
+        items: true,
+      },
+    });
     if (!order) {
       throw new NotFoundException(`Order with orderId ${id} Not Found`);
     }

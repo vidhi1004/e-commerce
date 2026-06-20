@@ -14,14 +14,14 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/upate-payment.dto';
 import { AuthGuard } from './auth/auth.guard';
 
-@Controller()
+@Controller('payment')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @UseGuards(AuthGuard)
   @Post()
   createPayment(@Body() createPaymentDto: CreatePaymentDto, @Req() req) {
-    const userId = Number(req.user.userId);
+    const userId = Number(req.user.id);
     const token = req.token;
     return this.appService.create(createPaymentDto, userId, token);
   }
@@ -42,7 +42,10 @@ export class AppController {
     @Param('id', ParseIntPipe) id: number,
     @Body()
     updatePaymentDto: UpdatePaymentDto,
+    @Req() req,
   ) {
-    return this.appService.update(id, updatePaymentDto);
+    const userId = Number(req.user.id);
+    const email = req.user.email;
+    return this.appService.update(id, updatePaymentDto, userId, email);
   }
 }

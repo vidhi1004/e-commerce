@@ -23,16 +23,20 @@ export class Payment {
   @Column({
     type: 'enum',
     enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
   })
   paymentstatus: PaymentStatus;
 
   @Column({
     type: 'enum',
     enum: PaymentMode,
+    default: PaymentMode.UNDEFINED,
   })
   paymentMode: PaymentMode;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   transactionId: string;
 
   @Column({

@@ -70,9 +70,12 @@ export class InventoryController {
 
   @EventPattern('order.confirmed')
   async handleOrderConfirmed(data: { order: any }) {
+    console.log(data);
     try {
       if (data && data.order && data.order.items) {
         for (const item of data.order.items) {
+          console.log(item.quantity);
+          console.log(item.productVariantId);
           await this.inventoryService.orderConfirmed(
             item.productVariantId,
             item.quantity,

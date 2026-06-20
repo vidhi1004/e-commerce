@@ -16,12 +16,21 @@ export class AppController {
   }
   @EventPattern('payment.success')
   async handleOrderSuccess(data: any) {
-    console.log(data);
+    const recipients = data.email;
+    const subject = 'Order confirmed';
+    const html = `<h1>Order Confirmed!</h1><p>Thank You For Shopping</p>`;
+    const sendEmailDto = { recipients, subject, html };
+    return this.appService.sendEmail(sendEmailDto);
   }
   @EventPattern('payment.failed')
   async handleOrderFaliure(data: any) {
-    console.log(data);
+    const recipients = data.email;
+    const subject = 'Payment Failed';
+    const html = `<h1>Payment Failed!</h1><p>Please Try Again</p>`;
+    const sendEmailDto = { recipients, subject, html };
+    return this.appService.sendEmail(sendEmailDto);
   }
+
   @EventPattern('payment.refunded')
   async handleOrderRefund(data: any) {
     console.log(data);

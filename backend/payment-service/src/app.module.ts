@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,7 +8,9 @@ import { NOTIFICATION_CLIENT, ORDER_CLIENT } from './constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { entities } from './entity';
 import { HttpModule } from '@nestjs/axios';
+import Razorpay from 'razorpay';
 
+@Global()
 @Module({
   imports: [
     HttpModule,
@@ -34,7 +36,7 @@ import { HttpModule } from '@nestjs/axios';
         name: NOTIFICATION_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
+          urls: ['amqp://guest:guest@localhost:5673'],
           queue: 'notification_queue',
           queueOptions: {
             durable: true,
@@ -47,8 +49,8 @@ import { HttpModule } from '@nestjs/axios';
         name: ORDER_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
-          queue: 'notification_queue',
+          urls: ['amqp://guest:guest@localhost:5673'],
+          queue: 'order_queue',
           queueOptions: {
             durable: true,
           },

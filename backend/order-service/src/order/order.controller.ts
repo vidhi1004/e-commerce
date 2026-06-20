@@ -62,6 +62,7 @@ export class OrderController {
   }
   @EventPattern('payment.success')
   handlePaymentConfirmantion(data: any) {
+    console.log(data);
     const id = data.orderId;
     const updateOrderDto = { status: Status.CONFIRMED };
     return this.orderService.update(id, updateOrderDto);

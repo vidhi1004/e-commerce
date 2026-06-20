@@ -93,6 +93,7 @@ export class InventoryService {
 
     inventory.stock -= quantity;
     inventory.reservedStock += quantity;
+    console.log(inventory);
     await this.inventoryRepo.save(inventory);
   }
   async orderConfirmed(productVariantId: number, quantity: number) {
@@ -103,6 +104,7 @@ export class InventoryService {
       throw new ConflictException('Inventory Not Found');
     }
     inventory.reservedStock = Math.max(0, inventory.reservedStock - quantity);
+    console.log(inventory);
     await this.inventoryRepo.save(inventory);
   }
   async orderCancelled(productVariantId: number, quantity: number) {
@@ -115,6 +117,7 @@ export class InventoryService {
     inventory.stock += quantity;
 
     inventory.reservedStock = Math.max(0, inventory.reservedStock - quantity);
+    console.log(inventory);
     await this.inventoryRepo.save(inventory);
   }
 

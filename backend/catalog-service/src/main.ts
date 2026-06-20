@@ -8,13 +8,14 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://guest:guest@localhost:5672'],
+      urls: ['amqp://guest:guest@localhost:5673'],
       queue: 'inventory_queue',
       queueOptions: {
         durable: true,
       },
     },
   });
+  await app.startAllMicroservices();
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3001);
 }

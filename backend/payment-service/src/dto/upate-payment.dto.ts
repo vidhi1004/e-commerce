@@ -1,11 +1,19 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { PaymentMode } from 'src/enum/paymentMode.enum';
 import { PaymentStatus } from 'src/enum/paymentStatus.enum';
 
 export class UpdatePaymentDto {
   @IsEnum(PaymentStatus)
-  paymentStatus: PaymentStatus;
+  paymentstatus: PaymentStatus;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   transactionId: string;
+
+  @IsEnum(PaymentMode)
+  paymentMode: PaymentMode;
+
+  @IsNotEmpty()
+  razorpayPaymentId: string;
+  razorpaySignature?: string;
 }

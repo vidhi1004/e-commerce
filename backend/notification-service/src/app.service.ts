@@ -9,7 +9,7 @@ export class AppService {
   emailTransport() {
     const transporter = nodemailer.createTransport({
       host: this.configService.get('EMAIL_HOST'),
-      port: this.configService.get<number>('PORT'),
+      port: this.configService.get<number>('EMAIL_PORT'),
       secure: false,
       auth: {
         user: this.configService.get<string>('EMAIL_USER'),

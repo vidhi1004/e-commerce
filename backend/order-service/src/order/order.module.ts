@@ -17,7 +17,7 @@ import { INVENTORY_CLIENT, NOTIFICATION_CLIENT } from 'src/constants';
         name: NOTIFICATION_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
+          urls: ['amqp://guest:guest@localhost:5673'],
           queue: 'notification_queue',
           queueOptions: {
             durable: true,
@@ -30,7 +30,7 @@ import { INVENTORY_CLIENT, NOTIFICATION_CLIENT } from 'src/constants';
         name: INVENTORY_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5672'],
+          urls: ['amqp://guest:guest@localhost:5673'],
           queue: 'inventory_queue',
           queueOptions: {
             durable: true,

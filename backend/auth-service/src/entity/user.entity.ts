@@ -5,7 +5,6 @@ import { refreshToken } from './refreshToken.entity';
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;

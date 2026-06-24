@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AuthService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entity/user.entity';
 import { refreshToken } from './entity/refreshToken.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { entities } from './entity';
+import { AuthGrpcController } from './auth.grpc.controller';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { entities } from './entity';
     }),
     TypeOrmModule.forFeature([Users, refreshToken]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, AuthGrpcController],
+  providers: [AuthService],
 })
 export class AppModule {}

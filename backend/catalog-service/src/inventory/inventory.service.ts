@@ -39,11 +39,18 @@ export class InventoryService {
       ...createInventoryDto,
       productVariant,
     });
-    return this.inventoryRepo.save(inventory);
+    const savedInventory = await this.inventoryRepo.save(inventory);
+    return {
+      id: savedInventory.id,
+      stock: savedInventory.stock,
+      reservedStock: savedInventory.reservedStock,
+      productVariantId: savedInventory.productVariant.id,
+    };
   }
 
   async findAll() {
-    return await this.inventoryRepo.find();
+    const inventories = await this.inventoryRepo.find();
+    return { inventories };
   }
 
   async findOne(id: number) {

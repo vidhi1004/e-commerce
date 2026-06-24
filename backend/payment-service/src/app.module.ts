@@ -7,13 +7,23 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NOTIFICATION_CLIENT, ORDER_CLIENT } from './constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { entities } from './entity';
-import { HttpModule } from '@nestjs/axios';
-import Razorpay from 'razorpay';
+import { join } from 'path';
+import { PaymentGrpcController } from './app.grpc.controller';
 
 @Global()
 @Module({
   imports: [
-    HttpModule,
+    ClientsModule.register([
+      {
+        name: 'ORDER_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'order',
+          protoPath: join(process.cwd(), '/proto/order.proto'),
+          url: 'order-service:5003',
+        },
+      },
+    ]),
     TypeOrmModule.forFeature([Payment]),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
@@ -36,7 +46,7 @@ import Razorpay from 'razorpay';
         name: NOTIFICATION_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5673'],
+          urls: ['amqp://guest:guest@rabbitmq:5672'],
           queue: 'notification_queue',
           queueOptions: {
             durable: true,
@@ -49,7 +59,7 @@ import Razorpay from 'razorpay';
         name: ORDER_CLIENT,
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://guest:guest@localhost:5673'],
+          urls: ['amqp://guest:guest@rabbitmq:5672'],
           queue: 'order_queue',
           queueOptions: {
             durable: true,
@@ -57,9 +67,10 @@ import Razorpay from 'razorpay';
         },
       },
     ]),
+
     TypeOrmModule.forFeature([Payment]),
   ],
-  controllers: [AppController],
+  controllers: [AppController, PaymentGrpcController],
   providers: [AppService],
 })
 export class AppModule {}

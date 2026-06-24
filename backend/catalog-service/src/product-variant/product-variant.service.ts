@@ -41,11 +41,12 @@ export class ProductVariantService {
   }
 
   async findAll() {
-    return await this.productVariantRepo.find({
+    const variants = await this.productVariantRepo.find({
       where: {
         isActive: true,
       },
     });
+    return { productVariants: variants };
   }
 
   async findOne(id: number) {

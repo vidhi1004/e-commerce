@@ -13,7 +13,6 @@ import { OrderItem } from './orderItem.entity';
 export class Order {
   @PrimaryGeneratedColumn({
     name: 'id',
-    type: 'bigint',
   })
   id: number;
 

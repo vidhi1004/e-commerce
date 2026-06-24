@@ -1,12 +1,42 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ReviewService } from './review/review.service';
+import {
+  DeleteReviewDto,
+  CreateReviewDto,
+  UpdateReviewDto,
+  GetReviewByIdDto,
+  GetReviewsByProductIdDto,
+  ReviewServiceController,
+  ReviewServiceControllerMethods,
+} from './review';
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+@ReviewServiceControllerMethods()
+export class AppController implements ReviewServiceController {
+  constructor(private readonly reviewService: ReviewService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  async createReview(request: CreateReviewDto) {
+    return this.reviewService.create(request, request.userId);
+  }
+
+  async getAllReviews() {
+    return this.reviewService.findAll();
+  }
+
+  async getReviewById(request: GetReviewByIdDto) {
+    return this.reviewService.findOne(request.id);
+  }
+
+  async getReviewsByProductId(request: GetReviewsByProductIdDto) {
+    return this.reviewService.findByProductId(request.productId);
+  }
+
+  async updateReview(request: UpdateReviewDto) {
+    return this.reviewService.update(request.id, request, request.userId);
+  }
+
+  async deleteReview(request: DeleteReviewDto) {
+    return this.reviewService.remove(request.id, request.userId);
   }
 }

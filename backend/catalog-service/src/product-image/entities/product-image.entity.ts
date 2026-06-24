@@ -4,7 +4,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class ProductImage {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;

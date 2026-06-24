@@ -12,7 +12,6 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 @Entity()
 export class ProductVariant {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;

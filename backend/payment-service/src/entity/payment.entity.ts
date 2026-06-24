@@ -10,7 +10,6 @@ import {
 @Entity()
 export class Payment {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;
@@ -45,6 +44,11 @@ export class Payment {
     scale: 2,
   })
   amount: number;
+  @Column({ nullable: true })
+  razorpayPaymentId: string;
+
+  @Column({ nullable: true })
+  razorpaySignature: string;
 
   @CreateDateColumn()
   createdAt: Date;

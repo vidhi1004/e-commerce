@@ -32,19 +32,19 @@ export class OrderService {
   ) {}
   private async getProduct(id: number) {
     const product = await firstValueFrom(
-      this.httpService.get(`http://localhost:3001/product/${id}`),
+      this.httpService.get(`http://api-gateway:3000/catalog/products/${id}`),
     );
     return product.data;
   }
   private async getProductVariant(id: number) {
     const productVariant = await firstValueFrom(
-      this.httpService.get(`http://localhost:3001/product-variant/${id}`),
+      this.httpService.get(`http://api-gateway:3000/product-variant/${id}`),
     );
     return productVariant.data;
   }
   private async getInventory(id: number) {
     const inventory = await firstValueFrom(
-      this.httpService.get(`http://localhost:3001/inventory/${id}`),
+      this.httpService.get(`http://api-gateway:3000/inventory/${id}`),
     );
     return inventory.data;
   }
@@ -114,20 +114,27 @@ export class OrderService {
     this.inventoryClinet.emit('order.created', {
       items: createOrderDto.items,
     });
-    return await this.orderRepo.findOne({
+    const createdOrder = await this.orderRepo.findOne({
       where: { id: savedOrder.id },
       relations: {
         items: true,
       },
     });
+
+    if (!createdOrder) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return createdOrder;
   }
 
   async findAll() {
-    return await this.orderRepo.find({
+    const orders = await this.orderRepo.find({
       relations: {
         items: true,
       },
     });
+    return { orders };
   }
 
   async findOne(id: number, userId: number) {
@@ -140,6 +147,7 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not Found');
     }
+    console.log(order.userId);
     if (userId !== order.userId) {
       throw new UnauthorizedException('Not Authorized');
     }

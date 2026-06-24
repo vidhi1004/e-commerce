@@ -14,7 +14,7 @@ export class ProductService {
     @InjectRepository(Category)
     private readonly CategoryRepo: Repository<Category>,
   ) {}
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto): Promise<Product> {
     const categoryId = createProductDto.categoryId;
     const category = await this.CategoryRepo.findOne({
       where: { id: categoryId },
@@ -24,19 +24,23 @@ export class ProductService {
     }
     const product = this.ProductRepo.create({ ...createProductDto, category });
 
-    return await this.ProductRepo.save(product);
+    const savedProducts = await this.ProductRepo.save(product);
+    return savedProducts;
   }
 
   async findAll() {
-    return await this.ProductRepo.find({
+    const products = await this.ProductRepo.find({
       where: {
         isActive: true,
       },
     });
+    return { products };
   }
 
   async findOne(id: number) {
-    const product = await this.ProductRepo.findOne({ where: { id } });
+    const product = await this.ProductRepo.findOne({
+      where: { id },
+    });
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
@@ -44,10 +48,14 @@ export class ProductService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.ProductRepo.findOne({ where: { id } });
+    const product = await this.ProductRepo.findOne({
+      where: { id },
+    });
+
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
+
     if (updateProductDto.categoryId) {
       const category = await this.CategoryRepo.findOne({
         where: {
@@ -60,9 +68,11 @@ export class ProductService {
           `Category with id ${updateProductDto.categoryId} not found`,
         );
       }
-      const updatedProduct = Object.assign(product, updateProductDto);
-      return await this.ProductRepo.save(updatedProduct);
     }
+
+    const updatedProduct = Object.assign(product, updateProductDto);
+
+    return await this.ProductRepo.save(updatedProduct);
   }
 
   async remove(id: number) {

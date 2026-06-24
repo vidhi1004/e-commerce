@@ -11,7 +11,6 @@ import {
 @Entity()
 export class Inventory {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;

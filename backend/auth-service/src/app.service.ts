@@ -15,8 +15,10 @@ import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Empty } from './auth';
+import { cookies } from 'supertest';
 @Injectable()
-export class AppService {
+export class AuthService {
   constructor(
     @InjectRepository(Users)
     private readonly userRepo: Repository<Users>,
@@ -25,18 +27,19 @@ export class AppService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getAllUsers(): Promise<Users[]> {
+  async getAllUsers() {
     return await this.userRepo.find();
   }
 
-  getUserById(id: number, userId: number) {
-    if (id !== userId) {
-      throw new UnauthorizedException('Not Authorized');
+  async getUserById(id: number): Promise<Users> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(` user with id ${id} not found`);
     }
-    return this.userRepo.findOne({ where: { id } });
+    return user;
   }
 
-  async registerCustomer(createUserDto: CreateUserDto): Promise<Users> {
+  async registerUser(createUserDto: CreateUserDto): Promise<Users> {
     const password = createUserDto.password;
     const hashPassword = await bcrypt.hash(password, 10);
     const email = createUserDto.email;
@@ -78,7 +81,7 @@ export class AppService {
     return { token, refresh_token };
   }
 
-  async jwtToken(id: number, email: string, role: Role) {
+  private async jwtToken(id: number, email: string, role: Role) {
     const secret = this.configService.get('JWT_SECRET');
     const expiresAt = this.configService.get('JWT_EXPIRES_IN');
     const refreshToken_secret = this.configService.get('REFRESH_TOKEN_SECRET');
@@ -93,7 +96,9 @@ export class AppService {
     return { token, refresh_token };
   }
 
-  async reGenerateRefreshToken(refreshTokenDto: RefreshTokenDto) {
+  async reGenerateRefreshToken(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ token: string; refresh_token: string }> {
     const secret = this.configService.get('JWT_SECRET');
     const expiresAt = this.configService.get('JWT_EXPIRES_IN');
     const refreshToken_secret = this.configService.get('REFRESH_TOKEN_SECRET');
@@ -120,25 +125,25 @@ export class AppService {
     });
     TokenData.token = refresh_token;
     await this.refreshTokenRepo.save(TokenData);
-    return { access_token, refresh_token };
+    return { token, refresh_token };
   }
 
-  async logout(id: number, userId: number) {
-    if (id !== userId) {
-      throw new UnauthorizedException('Not Authorized');
-    }
+  async logout(id: number): Promise<string> {
+    // if (id !== userId) {
+    //   throw new UnauthorizedException('Not Authorized');
+    // }
     try {
       await this.refreshTokenRepo.delete({ user: { id: id } });
       return 'Logout Successfull';
     } catch (error) {
-      return error;
+      return 'Logout Failed';
     }
   }
 
-  async updateUser(updateUserDto: UpdateUserDto, id: number, userId: number) {
-    if (id !== userId) {
-      throw new UnauthorizedException('Not Authorized');
-    }
+  async updateUser(updateUserDto: UpdateUserDto, id: number) {
+    // if (id !== userId) {
+    //   throw new UnauthorizedException('Not Authorized');
+    // }
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(` user with id ${id} not found`);
@@ -147,10 +152,10 @@ export class AppService {
     return await this.userRepo.save(newData);
   }
 
-  async deleteUser(id: number, userId: number) {
-    if (id !== userId) {
-      throw new UnauthorizedException('Not Authorized');
-    }
+  async deleteUser(id: number) {
+    // if (id !== userId) {
+    //   throw new UnauthorizedException('Not Authorized');
+    // }
     const user = await this.userRepo.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(` user with id ${id} not found`);

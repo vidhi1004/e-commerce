@@ -32,7 +32,10 @@ export class ProductImageService {
   }
 
   async findAll() {
-    return await this.productImageRepo.find();
+    const images = await this.productImageRepo.find();
+    return {
+      productImages: images,
+    };
   }
 
   async findOne(id: number) {

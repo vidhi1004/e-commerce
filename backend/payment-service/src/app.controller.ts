@@ -23,7 +23,7 @@ export class AppController {
   createPayment(@Body() createPaymentDto: CreatePaymentDto, @Req() req) {
     const userId = Number(req.user.id);
     const token = req.token;
-    return this.appService.create(createPaymentDto, userId, token);
+    return this.appService.create(createPaymentDto, userId);
   }
 
   @Get()

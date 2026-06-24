@@ -12,7 +12,6 @@ import {
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
     name: 'id',
   })
   id: number;
@@ -25,9 +24,10 @@ export class Product {
   @Column({
     default: () => 'CURRENT_TIMESTAMP',
   })
+  createdAt: Date;
   @Column({ default: true })
   isActive: boolean;
-  createdAt: Date;
+
   @Column({
     default: () => 'CURRENT_TIMESTAMP',
   })

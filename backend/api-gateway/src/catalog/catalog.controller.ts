@@ -86,6 +86,11 @@ export class CatalogController {
     return this.catalogService.getAllProductVariants({});
   }
 
+  @Get('variants/id/:id')
+  getProductVariantByVariantId(@Param('id', ParseIntPipe) id: number) {
+    return this.catalogService.getProductVariantByVariantId({ id });
+  }
+
   @Get('variants/:id')
   getProductVariantById(@Param('id', ParseIntPipe) id: number) {
     return this.catalogService.getProductVariantById({ id });

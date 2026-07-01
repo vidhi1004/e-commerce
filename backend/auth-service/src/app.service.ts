@@ -78,6 +78,7 @@ export class AuthService {
       expiresAt: expiresAt,
     });
     await this.refreshTokenRepo.save(refreshToken);
+
     return { token, refresh_token };
   }
 

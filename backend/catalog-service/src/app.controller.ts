@@ -91,6 +91,9 @@ export class AppController implements CatalogServiceController {
   async getProductVariantById(request: GetProductVariantByIdDto) {
     return this.productVariantService.findOne(request.id);
   }
+  async getProductVariantByVariantId(request: GetProductVariantByIdDto) {
+    return this.productVariantService.findByVariantId(request.id);
+  }
   async updateProductVariant(request: UpdateProductVariantDto) {
     return this.productVariantService.update(request.id, request);
   }

@@ -7,19 +7,22 @@
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { Status } from './enum/status.enum';
 
 export const protobufPackage = 'order';
 
-// export enum Status {
-//   PENDING = 0,
-//   CONFIRMED = 1,
-//   PAID = 2,
-//   SHIPPED = 3,
-//   DELIVERED = 4,
-//   CANCELLED = 5,
-//   UNRECOGNIZED = -1,
-// }
+export enum Status {
+  PENDING = 0,
+  CONFIRMED = 1,
+  PAID = 2,
+  SHIPPED = 3,
+  DELIVERED = 4,
+  CANCELLED = 5,
+  UNRECOGNIZED = -1,
+}
+
+export interface GetMyOrderDto {
+  id: number;
+}
 
 export interface Empty {}
 
@@ -27,17 +30,29 @@ export interface Item {
   productId: number;
   productVariantId: number;
   quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  productName: string;
+  sku: string;
 }
 
 export interface CreateOrderDto {
   userId: number;
   email: string;
   items: Item[];
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingPincode: string;
+  shippingPhone: string;
 }
 
 export interface GetOrderByIdDto {
   id: number;
   userId: number;
+}
+export interface GetOrderByIdAdminDto {
+  id: number;
 }
 
 export interface Order {
@@ -46,6 +61,16 @@ export interface Order {
   status: Status;
   totalAmount: number;
   items: Item[];
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingPincode: string;
+  shippingPhone: string;
+  awbCode: string;
+  courierName: string;
+  shipmentId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Orders {
@@ -74,6 +99,10 @@ export interface OrderServiceClient {
   updateOrder(request: UpdateOrderDto): Observable<Order>;
 
   deleteOrder(request: DeleteOrderDto): Observable<Empty>;
+
+  getMyOrder(request: GetMyOrderDto): Observable<Orders>;
+
+  getOrderByIdAdmin(request: GetOrderByIdAdminDto): Observable<Order>;
 }
 
 export interface OrderServiceController {
@@ -94,6 +123,14 @@ export interface OrderServiceController {
   deleteOrder(
     request: DeleteOrderDto,
   ): Promise<Empty> | Observable<Empty> | Empty;
+
+  getMyOrder(
+    request: GetMyOrderDto,
+  ): Promise<Orders> | Observable<Orders> | Orders;
+
+  getOrderByIdAdmin(
+    request: GetOrderByIdAdminDto,
+  ): Promise<Order> | Observable<Order>;
 }
 
 export function OrderServiceControllerMethods() {
@@ -104,6 +141,8 @@ export function OrderServiceControllerMethods() {
       'getOrderById',
       'updateOrder',
       'deleteOrder',
+      'getMyOrder',
+      'getOrderByIdAdmin',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

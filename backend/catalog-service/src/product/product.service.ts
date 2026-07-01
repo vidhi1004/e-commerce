@@ -33,27 +33,49 @@ export class ProductService {
       where: {
         isActive: true,
       },
+      relations: {
+        images: true,
+        category: true,
+        variants: {
+          inventory: true,
+        },
+      },
     });
+    console.log(products[0]);
     return { products };
   }
 
   async findOne(id: number) {
     const product = await this.ProductRepo.findOne({
-      where: { id },
+      where: { id, isActive: true },
+      relations: {
+        images: true,
+        category: true,
+        variants: {
+          inventory: true,
+        },
+      },
     });
+
     if (!product) {
-      throw new NotFoundException(`Product with id ${id} not found`);
+      throw new NotFoundException('Product not found');
     }
+
     return product;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
     const product = await this.ProductRepo.findOne({
-      where: { id },
+      where: { id, isActive: true },
+      relations: {
+        images: true,
+        category: true,
+        variants: true,
+      },
     });
 
     if (!product) {
-      throw new NotFoundException(`Product with id ${id} not found`);
+      throw new NotFoundException('Product not found');
     }
 
     if (updateProductDto.categoryId) {
@@ -70,9 +92,21 @@ export class ProductService {
       }
     }
 
-    const updatedProduct = Object.assign(product, updateProductDto);
+    const updateProduct = Object.assign(product, updateProductDto);
+    await this.ProductRepo.save(updateProduct);
+    const updatedProduct = await this.ProductRepo.findOne({
+      where: { id },
+      relations: {
+        category: true,
+        variants: true,
+        images: true,
+      },
+    });
+    if (!updatedProduct) {
+      throw new NotFoundException('Product not found after update');
+    }
 
-    return await this.ProductRepo.save(updatedProduct);
+    return updatedProduct;
   }
 
   async remove(id: number) {

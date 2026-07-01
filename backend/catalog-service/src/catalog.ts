@@ -94,9 +94,9 @@ export interface Product {
   description: string;
   brand: string;
   isActive: boolean;
-  // category: Category | undefined;
-  // productVariants: ProductVariant[];
-  // productImages: ProductImage[];
+  category: Category | undefined;
+  variants: ProductVariant[];
+  images: ProductImage[];
 }
 
 export interface UpdateProductDto {
@@ -135,6 +135,7 @@ export interface ProductVariant {
   price: number;
   color: string;
   isActive: boolean;
+  inventory: Inventory;
 }
 
 export interface ProductVariants {
@@ -226,6 +227,10 @@ export interface CatalogServiceClient {
     request: GetProductVariantByIdDto,
   ): Observable<ProductVariant>;
 
+  getProductVariantByVariantId(
+    request: GetProductVariantByIdDto,
+  ): Observable<ProductVariant>;
+
   updateProductVariant(
     request: UpdateProductVariantDto,
   ): Observable<ProductVariant>;
@@ -308,6 +313,10 @@ export interface CatalogServiceController {
     request: GetProductVariantByIdDto,
   ): Promise<ProductVariant> | Observable<ProductVariant> | ProductVariant;
 
+  getProductVariantByVariantId(
+    request: GetProductVariantByIdDto,
+  ): Promise<ProductVariant> | Observable<ProductVariant> | ProductVariant;
+
   updateProductVariant(
     request: UpdateProductVariantDto,
   ): Promise<ProductVariant> | Observable<ProductVariant> | ProductVariant;
@@ -373,6 +382,7 @@ export function CatalogServiceControllerMethods() {
       'createProductVariant',
       'getAllProductVariants',
       'getProductVariantById',
+      'getProductVariantByVariantId',
       'updateProductVariant',
       'deleteProductVariant',
       'createProductImage',

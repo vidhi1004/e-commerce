@@ -45,13 +45,38 @@ export class ProductVariantService {
       where: {
         isActive: true,
       },
+      relations: {
+        inventory: true,
+      },
     });
     return { productVariants: variants };
   }
 
+  async findByVariantId(id: number) {
+    const productVariant = await this.productVariantRepo.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        inventory: true,
+      },
+    });
+    if (!productVariant) {
+      throw new NotFoundException(`Product Variant with id ${id} not found`);
+    }
+    return productVariant;
+  }
+
   async findOne(id: number) {
     const productVariant = await this.productVariantRepo.findOne({
-      where: { id },
+      where: {
+        product: {
+          id,
+        },
+      },
+      relations: {
+        inventory: true,
+      },
     });
     if (!productVariant) {
       throw new NotFoundException(`Product Variant with id ${id} not found`);

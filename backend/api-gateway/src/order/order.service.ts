@@ -3,12 +3,16 @@ import {
   CreateOrderDto,
   DeleteOrderDto,
   Empty,
+  GetMyOrderDto,
+  GetOrderByIdAdminDto,
   GetOrderByIdDto,
   ORDER_SERVICE_NAME,
   OrderServiceClient,
   UpdateOrderDto,
 } from './order';
 import type { ClientGrpc } from '@nestjs/microservices';
+import { mapOrderStatus } from 'src/enum/enum.mapper';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class OrderService implements OnModuleInit {
@@ -25,18 +29,73 @@ export class OrderService implements OnModuleInit {
       );
   }
 
-  createOrder(request: CreateOrderDto) {
-    return this.orderService.createOrder(request);
+  async createOrder(request: CreateOrderDto) {
+    const order = await firstValueFrom(this.orderService.createOrder(request));
+    return order;
   }
 
-  getAllOrders(request: Empty) {
-    return this.orderService.getAllOrders(request);
+  async getAllOrders(request: Empty) {
+    const response = await firstValueFrom(
+      this.orderService.getAllOrders(request),
+    );
+
+    return {
+      ...response,
+      orders: response.orders.map((order) => ({
+        ...order,
+        status: mapOrderStatus(order.status),
+      })),
+    };
+  }
+  async getMyOrder(request: GetMyOrderDto) {
+    const response = await firstValueFrom(
+      this.orderService.getMyOrder(request),
+    );
+
+    console.log({
+      ...response,
+      orders: response.orders.map((order) => ({
+        ...order,
+        status: mapOrderStatus(order.status),
+      })),
+    });
+
+    return {
+      ...response,
+      orders: response.orders.map((order) => ({
+        ...order,
+        status: mapOrderStatus(order.status),
+      })),
+    };
   }
 
-  getOrderById(request: GetOrderByIdDto) {
-    return this.orderService.getOrderById(request);
+  async getOrderById(request: GetOrderByIdDto) {
+    const order = await firstValueFrom(this.orderService.getOrderById(request));
+
+    console.log({
+      ...order,
+      status: mapOrderStatus(order.status),
+    });
+    return {
+      ...order,
+      status: mapOrderStatus(order.status),
+    };
   }
 
+  async getOrderByIdAdmin(request: GetOrderByIdAdminDto) {
+    const order = await firstValueFrom(
+      this.orderService.getOrderByIdAdmin(request),
+    );
+
+    console.log({
+      ...order,
+      status: mapOrderStatus(order.status),
+    });
+    return {
+      ...order,
+      status: mapOrderStatus(order.status),
+    };
+  }
   updateOrder(request: UpdateOrderDto) {
     return this.orderService.updateOrder(request);
   }

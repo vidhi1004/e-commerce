@@ -26,6 +26,8 @@ import {
   UpdateProductImageDto,
   UpdateProductVariantDto,
 } from './catalog';
+import { firstValueFrom } from 'rxjs';
+import { mapSize } from 'src/enum/enum.mapper';
 
 @Injectable()
 export class CatalogService implements OnModuleInit {
@@ -42,12 +44,36 @@ export class CatalogService implements OnModuleInit {
         CATALOG_SERVICE_NAME,
       );
   }
-  getAllProducts(request: Empty) {
-    return this.catalogService.getAllProducts(request);
+
+  async getAllProducts(request: Empty) {
+    const response = await firstValueFrom(
+      this.catalogService.getAllProducts(request),
+    );
+
+    return {
+      ...response,
+      products: response.products.map((product) => ({
+        ...product,
+        variants: product.variants.map((variant) => ({
+          ...variant,
+          size: mapSize(variant.size),
+        })),
+      })),
+    };
   }
 
-  getProductById(request: GetProductByIdDto) {
-    return this.catalogService.getProductById(request);
+  async getProductById(request: GetProductByIdDto) {
+    const product = await firstValueFrom(
+      this.catalogService.getProductById(request),
+    );
+
+    return {
+      ...product,
+      variants: product.variants.map((variant) => ({
+        ...variant,
+        size: mapSize(variant.size),
+      })),
+    };
   }
 
   createProduct(request: CreateProductDto) {
@@ -85,12 +111,39 @@ export class CatalogService implements OnModuleInit {
     return this.catalogService.createProductVariant(request);
   }
 
-  getAllProductVariants(request: Empty) {
-    return this.catalogService.getAllProductVariants(request);
+  async getAllProductVariants(request: Empty) {
+    const response = await firstValueFrom(
+      this.catalogService.getAllProductVariants(request),
+    );
+    return {
+      ...response,
+      productVariants: response.productVariants.map((productVariant) => ({
+        ...productVariant,
+        size: mapSize(productVariant.size),
+      })),
+    };
   }
 
-  getProductVariantById(request: GetProductVariantByIdDto) {
-    return this.catalogService.getProductVariantById(request);
+  async getProductVariantById(request: GetProductVariantByIdDto) {
+    const productVarinat = await firstValueFrom(
+      this.catalogService.getProductVariantById(request),
+    );
+
+    return {
+      ...productVarinat,
+      size: mapSize(productVarinat.size),
+    };
+  }
+
+  async getProductVariantByVariantId(request: GetProductVariantByIdDto) {
+    const productVarinat = await firstValueFrom(
+      this.catalogService.getProductVariantByVariantId(request),
+    );
+
+    return {
+      ...productVarinat,
+      size: mapSize(productVarinat.size),
+    };
   }
 
   updateProductVariant(request: UpdateProductVariantDto) {

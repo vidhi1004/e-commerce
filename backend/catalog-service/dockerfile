@@ -10,6 +10,7 @@ COPY catalog-service .
 
 COPY proto ./proto
 
-RUN npm run build
+# RUN npm run build
 
-CMD ["node","dist/src/main.js"]
+# CMD ["node","dist/src/main.js"]
+CMD ["npm","run","start:dev"]

@@ -16,7 +16,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         options: {
           package: 'catalog',
           protoPath: join(process.cwd(), '/proto/catalog.proto'),
-          url: 'localhost:5002',
+          url: 'catalog-service:5002',
         },
       },
       {
@@ -25,7 +25,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         options: {
           package: 'order',
           protoPath: join(process.cwd(), '/proto/order.proto'),
-          url: 'localhost:5003',
+          url: 'order-service:5003',
         },
       },
     ]),

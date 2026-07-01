@@ -15,6 +15,6 @@ export class ProductImage {
   isPrimary: boolean;
   @Column()
   displayOrder: number;
-  @ManyToOne(() => Product, (product) => product.image)
+  @ManyToOne(() => Product, (product) => product.images)
   product: Product;
 }

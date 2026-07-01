@@ -32,6 +32,30 @@ export class Order {
   })
   totalAmount: number;
 
+  @Column({ nullable: true })
+  shippingAddress: string;
+
+  @Column({ nullable: true })
+  shippingCity: string;
+
+  @Column({ nullable: true })
+  shippingState: string;
+
+  @Column({ nullable: true })
+  shippingPincode: string;
+
+  @Column({ nullable: true })
+  shippingPhone: string;
+
+  @Column({ nullable: true })
+  awbCode: string;
+
+  @Column({ nullable: true })
+  courierName: string;
+
+  @Column({ nullable: true })
+  shipmentId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

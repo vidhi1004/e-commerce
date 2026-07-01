@@ -17,6 +17,7 @@ export class AppController implements ReviewServiceController {
   constructor(private readonly reviewService: ReviewService) {}
 
   async createReview(request: CreateReviewDto) {
+    console.log('Controller reached');
     return this.reviewService.create(request, request.userId);
   }
 

@@ -18,6 +18,7 @@ service CatalogService {
     rpc createProductVariant(CreateProductVariantDto) returns (ProductVariant);
     rpc getAllProductVariants(Empty) returns (ProductVariants);
     rpc getProductVariantById(GetProductVariantByIdDto) returns (ProductVariant);
+    rpc getProductVariantByVariantId(GetProductVariantByIdDto) returns (ProductVariant);
     rpc updateProductVariant(UpdateProductVariantDto) returns (ProductVariant);
     rpc deleteProductVariant(DeleteProductVariantDto) returns (Empty);
 
@@ -119,9 +120,9 @@ message Product {
     string description = 3;
     string brand = 4;
     bool isActive = 5;
-    // Category category = 6;
-    // repeated ProductVariant productVariants = 7;
-    // repeated ProductImage productImages = 8;    
+    Category category = 6;
+    repeated ProductVariant variants = 7;
+    repeated ProductImage images = 8;    
 }
 
 message UpdateProductDto{
@@ -163,6 +164,7 @@ message ProductVariant {
     double price =4;
     string color = 5;
     bool isActive = 6;
+    Inventory inventory = 7;
 }
 
 message ProductVariants {

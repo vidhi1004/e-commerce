@@ -10,7 +10,7 @@ async function bootstrap() {
     options: {
       protoPath: join(process.cwd(), '/proto/review.proto'),
       package: 'review',
-      url: process.env.GRPC_URL ?? 'review-service:5004',
+      url: process.env.GRPC_URL ?? 'review-service:5005',
     },
   });
   await app.startAllMicroservices();

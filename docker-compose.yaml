@@ -26,12 +26,18 @@ services:
     container_name: auth-service
     depends_on:
       - postgres
+    volumes:
+      - ./backend/auth-service:/app
+      - ./backend/proto:/app/proto
+      - auth_node_modules:/app/node_modules
+    command: npm run start:dev
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: ecommerce-auth
+      CHOKIDAR_USEPOLLING: "true"
 
   catalog-service:
     build:
@@ -40,12 +46,18 @@ services:
     container_name: catalog-service
     depends_on:
       - postgres
+    volumes:
+      - ./backend/catalog-service:/app
+      - ./backend/proto:/app/proto
+      - catalog_node_modules:/app/node_modules
+    command: npm run start:dev
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: ecommerce-catalog
+      CHOKIDAR_USEPOLLING: "true"
 
   order-service:
     build:
@@ -55,12 +67,18 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+    volumes:
+      - ./backend/order-service:/app
+      - ./backend/proto:/app/proto
+      - order_node_modules:/app/node_modules
+    command: npm run start:dev
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: ecommerce-order
+      CHOKIDAR_USEPOLLING: "true"
 
   payment-service:
     build:
@@ -70,12 +88,18 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+    volumes:
+      - ./backend/payment-service:/app
+      - ./backend/proto:/app/proto
+      - payment_node_modules:/app/node_modules
+    command: npm run start:dev
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: ecommerce-payment
+      CHOKIDAR_USEPOLLING: "true"
 
   review-service:
     build:
@@ -84,12 +108,18 @@ services:
     container_name: review-service
     depends_on:
       - postgres
+    volumes:
+      - ./backend/review-service:/app
+      - ./backend/proto:/app/proto
+      - review_node_modules:/app/node_modules
+    command: npm run start:dev
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: ecommerce-review
+      CHOKIDAR_USEPOLLING: "true"
 
   notification-service:
     build:
@@ -98,6 +128,12 @@ services:
     container_name: notification-service
     depends_on:
       - rabbitmq
+    volumes:
+      - ./backend/notification-service:/app
+      - notification_node_modules:/app/node_modules
+    command: npm run start:dev
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
 
   api-gateway:
     build:
@@ -112,6 +148,20 @@ services:
       - review-service
     ports:
       - "3000:3000"
+    volumes:
+      - ./backend/api-gateway:/app
+      - ./backend/proto:/app/proto
+      - gateway_node_modules:/app/node_modules
+    command: npm run start:dev
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
 
 volumes:
   postgres_data:
+  auth_node_modules:
+  catalog_node_modules:
+  order_node_modules:
+  payment_node_modules:
+  review_node_modules:
+  notification_node_modules:
+  gateway_node_modules:

@@ -55,7 +55,11 @@ export class InventoryService {
 
   async findOne(id: number) {
     const inventory = await this.inventoryRepo.findOne({
-      where: { id },
+      where: {
+        productVariant: {
+          id,
+        },
+      },
     });
     if (!inventory) {
       throw new NotFoundException(`inventory with id ${id} not found`);

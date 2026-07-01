@@ -40,8 +40,9 @@ export class ReviewService implements OnModuleInit {
           id: productId,
         }),
       );
-    } catch {
-      return null;
+    } catch (e) {
+      console.error('Catalog gRPC Error:', e);
+      throw e;
     }
   }
   async orderExists(orderId: number, userId: number) {
@@ -52,33 +53,41 @@ export class ReviewService implements OnModuleInit {
           userId,
         }),
       );
-    } catch {
-      return null;
+    } catch (e) {
+      console.error('Catalog gRPC Error:', e);
+      throw e;
     }
   }
   async create(createReviewDto: CreateReviewDto, userId: number) {
-    const product = await this.productExists(createReviewDto.productId);
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    try {
+      console.log(createReviewDto);
+
+      const product = await this.productExists(createReviewDto.productId);
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      const order = await this.orderExists(createReviewDto.orderId, userId);
+      if (!order || order.userId !== userId) {
+        throw new ForbiddenException('You are not the owner of this order');
+      }
+      if (order.status !== Status.DELIVERED) {
+        throw new ForbiddenException('You can only review delivered orders');
+      }
+      const reviewExists = await this.reviewRepository.findOne({
+        where: { productId: createReviewDto.productId, userId: userId },
+      });
+      if (reviewExists) {
+        throw new ForbiddenException('You have already reviewed this product');
+      }
+      const review = this.reviewRepository.create({
+        ...createReviewDto,
+        userId: userId,
+      });
+      return this.reviewRepository.save(review);
+    } catch (e) {
+      console.error(e);
+      throw e;
     }
-    const order = await this.orderExists(createReviewDto.orderId, userId);
-    if (!order || order.userId !== userId) {
-      throw new ForbiddenException('You are not the owner of this order');
-    }
-    if (order.status !== Status.DELIVERED) {
-      throw new ForbiddenException('You can only review delivered orders');
-    }
-    const reviewExists = await this.reviewRepository.findOne({
-      where: { productId: createReviewDto.productId, userId: userId },
-    });
-    if (reviewExists) {
-      throw new ForbiddenException('You have already reviewed this product');
-    }
-    const review = this.reviewRepository.create({
-      ...createReviewDto,
-      userId: userId,
-    });
-    return this.reviewRepository.save(review);
   }
 
   async findAll() {

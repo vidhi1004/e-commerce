@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { EventPattern } from '@nestjs/microservices';
+import { orderCreatedTemplate } from './templates/orderCreated';
 
 @Controller()
 export class AppController {
@@ -10,7 +11,7 @@ export class AppController {
   async sendOrderEmail(data: any) {
     const recipients = data.email;
     const subject = 'Order created , move to payment to confirm the order';
-    const html = `<h1>Order Created!</h1><p>Please pay.</p>`;
+    const html = orderCreatedTemplate('user', data.orderId, data.totalAmount);
     const sendEmailDto = { recipients, subject, html };
     return this.appService.sendEmail(sendEmailDto);
   }
@@ -18,7 +19,7 @@ export class AppController {
   async handleOrderSuccess(data: any) {
     const recipients = data.email;
     const subject = 'Order confirmed';
-    const html = `<h1>Order Confirmed!</h1><p>Thank You For Shopping</p>`;
+    const html = orderConfirmedTemplate();
     const sendEmailDto = { recipients, subject, html };
     return this.appService.sendEmail(sendEmailDto);
   }

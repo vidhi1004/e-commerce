@@ -75,7 +75,7 @@ export class AppService {
     let RazorpayOrder;
     try {
       RazorpayOrder = await this.razorpayInstance.orders.create({
-        amount: Math.round(amount * 100),
+        amount: Math.round(Number(order.totalAmount) * 100),
         currency: 'INR',
         receipt: `${createPaymentDto.orderId}`,
       });
@@ -92,6 +92,8 @@ export class AppService {
     });
 
     const savedPayment = await this.paymentRepo.save(payment);
+
+    console.log(savedPayment);
 
     return {
       ...savedPayment,

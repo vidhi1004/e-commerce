@@ -39,6 +39,6 @@ export class Product {
   @OneToMany(() => ProductVariant, (variants) => variants.product)
   variants: ProductVariant[];
 
-  @OneToMany(() => ProductImage, (image) => image.product)
-  image: ProductImage[];
+  @OneToMany(() => ProductImage, (images) => images.product)
+  images: ProductImage[];
 }

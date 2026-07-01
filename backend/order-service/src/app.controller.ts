@@ -1,10 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller } from '@nestjs/common';
 import { OrderService } from './order/order.service';
 import {
   CreateOrderDto,
   DeleteOrderDto,
   Empty,
+  GetMyOrderDto,
+  GetOrderByIdAdminDto,
   GetOrderByIdDto,
   Order,
   OrderServiceController,
@@ -25,6 +26,10 @@ export class AppController implements OrderServiceController {
     return this.orderService.findAll();
   }
 
+  getMyOrder(request: GetMyOrderDto) {
+    return this.orderService.getMyOrder(request.id);
+  }
+
   async getOrderById(request: GetOrderByIdDto) {
     try {
       console.log('REQUEST:', request);
@@ -32,6 +37,17 @@ export class AppController implements OrderServiceController {
       const order = await this.orderService.findOne(request.id, request.userId);
 
       console.log('ORDER:', order);
+
+      return order;
+    } catch (err) {
+      console.error('ERROR:', err);
+      throw err;
+    }
+  }
+
+  async getOrderByIdAdmin(request: GetOrderByIdAdminDto) {
+    try {
+      const order = await this.orderService.findOneAdmin(request.id);
 
       return order;
     } catch (err) {

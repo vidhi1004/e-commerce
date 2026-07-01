@@ -1,6 +1,11 @@
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './create-orderItem.dto';
-import { ArrayMinSize, IsArray, ValidateNested } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateOrderDto {
   @IsArray()
@@ -8,4 +13,14 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   items: CreateOrderItemDto[];
+  @IsNotEmpty()
+  shippingAddress: string;
+  @IsNotEmpty()
+  shippingCity: string;
+  @IsNotEmpty()
+  shippingState: string;
+  @IsNotEmpty()
+  shippingPincode: string;
+  @IsNotEmpty()
+  shippingPhone: string;
 }

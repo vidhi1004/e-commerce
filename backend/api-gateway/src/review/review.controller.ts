@@ -21,6 +21,7 @@ export class ReviewController {
   @UseGuards(AuthGuard)
   @Post()
   createReview(@Body() dto: CreateReviewDto, @Req() req) {
+    console.log('API gateway Controller reached', dto);
     return this.reviewService.createReview({
       ...dto,
       userId: Number(req.user.id),

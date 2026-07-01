@@ -36,12 +36,26 @@ export class OrderController {
     return this.orderService.getAllOrders({});
   }
   @UseGuards(AuthGuard)
+  @Get('my')
+  getMyOrder(@Req() req) {
+    const id = Number(req.user.id);
+    return this.orderService.getMyOrder({ id });
+  }
+  @UseGuards(AuthGuard)
   @Get(':id')
   getOrderById(@Param('id', ParseIntPipe) id: number, @Req() req) {
     const userId = Number(req.user.id);
     return this.orderService.getOrderById({ id, userId });
   }
+
   @SetMetadata('role', Role.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Get('admin/:id')
+  getOrderByAdminId(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.getOrderByIdAdmin({ id });
+  }
+
+  // @SetMetadata('role', Role.ADMIN)
   @UseGuards(AuthGuard)
   @Patch(':id')
   updateOrder(
